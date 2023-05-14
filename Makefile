@@ -1,29 +1,33 @@
 TARGET=calc
+CC=gcc
 
 LIB_DIR=lib
 SRC_DIR=src
-BUILD_DIR=build
+OBJ_DIR=build
 
 IFLAGS=-I"$(LIB_DIR)"
 LFLAGS=-lm
 
 CFLAGS=-Wall -Werror -Wno-unused -std=c17 $(IFLAGS) $(LFLAGS)
 
-OBJS=$(patsubst %.c,%.o,$(wildcard $(SRC_DIR)/*.c))
+LIBS=$(wildcard $(LIB_DIR)/*.h)
+SRCS=$(wildcard $(SRC_DIR)/*.c)
+OBJ_A=$(SRCS:%.c=%.o)
+OBJS=$(OBJ_A:$(SRC_DIR)%=$(OBJ_DIR)%)
 
 $(TARGET): $(OBJS)
 	$(CC) -o $@ $^ $(CFLAGS)
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(LIBS) | $(OBJ_DIR)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-$(BUILD_DIR):
-	mkdir $(BUILD_DIR)
+$(OBJ_DIR):
+	mkdir $(OBJ_DIR)
 
 .PHONY: clean run
 
 clean:
-	$(RM) $(BUILD_DIR)
+	$(RM) -r $(OBJ_DIR)
 	$(RM) $(TARGET)
 
 run: $(TARGET)
